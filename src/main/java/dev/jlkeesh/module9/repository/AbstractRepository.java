@@ -35,9 +35,21 @@ public abstract class AbstractRepository<T, ID extends Serializable> {
         return entity;
     }
 
+
+    @Transactional
+    @SuppressWarnings("all")
+    public Iterable<T> saveAll(Iterable<T> entities) {
+        Assert.notNull(entities, "entities must not be null");
+        for (T entity : entities) {
+            save(entity);
+        }
+        return entities;
+    }
+
     public List<T> findAll() {
         return em.createQuery("select t from " + entityClass.getSimpleName() + " t", entityClass).getResultList();
     }
+
 
     public Optional<T> findById(ID id) {
         return Optional.ofNullable(em.find(entityClass, id));
