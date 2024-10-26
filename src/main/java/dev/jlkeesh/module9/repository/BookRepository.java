@@ -1,5 +1,7 @@
 package dev.jlkeesh.module9.repository;
 
+import dev.jlkeesh.module9.dto.BookClassProjection;
+import dev.jlkeesh.module9.dto.BookInterfaceProjection;
 import dev.jlkeesh.module9.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -35,5 +37,12 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query(value = "insert into books(title, author) values(?1,?2)",
             nativeQuery = true)
     void insertBook(String title, String author);
+
+    @Query(value = "select new dev.jlkeesh.module9.dto.BookClassProjection(id, title) from Book")
+    List<BookClassProjection> findAllClassProjection();
+
+
+    @Query("select t.id as id,t.title as title from Book t")
+    List<BookInterfaceProjection> findAllInterfaceProjection();
 
 }

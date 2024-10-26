@@ -1,15 +1,14 @@
 package dev.jlkeesh.module9.controller;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import dev.jlkeesh.module9.PostDto;
+import dev.jlkeesh.module9.dto.PostDto;
+import dev.jlkeesh.module9.dto.BookClassProjection;
+import dev.jlkeesh.module9.dto.BookInterfaceProjection;
 import dev.jlkeesh.module9.entity.Book;
 import dev.jlkeesh.module9.repository.BookRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
-import org.apache.tomcat.util.buf.UriUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
@@ -64,6 +62,16 @@ public class BookController {
             return bookRepository.findAll();
         }
         return bookRepository.findAllByAuthor(author);
+    }
+
+    @GetMapping("/classprojection")
+    public List<BookClassProjection> classProjection() {
+        return bookRepository.findAllClassProjection();
+    }
+
+    @GetMapping("/interfaceprojection")
+    public List<BookInterfaceProjection> interfaceProjection() {
+        return bookRepository.findAllInterfaceProjection();
     }
 
     @GetMapping(value = "/jsonnode", produces = {

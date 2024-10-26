@@ -1,4 +1,4 @@
-package dev.jlkeesh.module9;
+package dev.jlkeesh.module9.dto;
 
 import lombok.Data;
 
