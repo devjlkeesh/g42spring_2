@@ -1,6 +1,7 @@
 package dev.jlkeesh.module9.repository;
 
 import jakarta.persistence.EntityManager;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Optional;
+import java.util.zip.DataFormatException;
 
 public abstract class AbstractRepository<T, ID extends Serializable> {
 

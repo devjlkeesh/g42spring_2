@@ -26,6 +26,14 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Modifying
     @Transactional
+//    @Query("delete from Book t where t.id = #{book.id}")
     @Query("delete from Book t where t.id = ?1")
     void delete(Long id);
+//    void delete(Book book);
+
+
+    @Query(value = "insert into books(title, author) values(?1,?2)",
+            nativeQuery = true)
+    void insertBook(String title, String author);
+
 }
