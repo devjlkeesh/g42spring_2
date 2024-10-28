@@ -14,12 +14,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -29,6 +26,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -36,13 +34,21 @@ import java.util.List;
 public class SecurityConfig {
 
 
+    public static final String[] WHITE_LIST = {
+            "/api/auth/**",
+            "/swagger-ui/**",
+            "/swagger-resources/**",
+            "/v3/api-docs/**",
+    };
     private final ObjectMapper objectMapper;
     private final JwtTokenUtil jwtTokenUtil;
+    private final UserDetailsService userDetailsService;
 
     public SecurityConfig(ObjectMapper objectMapper,
-                          JwtTokenUtil jwtTokenUtil) {
+                          JwtTokenUtil jwtTokenUtil, UserDetailsService userDetailsService) {
         this.objectMapper = objectMapper;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.userDetailsService = userDetailsService;
     }
 
     @Bean
@@ -50,7 +56,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(httpReqConf ->
-                        httpReqConf.requestMatchers("/api/auth/**")
+                        httpReqConf.requestMatchers(WHITE_LIST)
                                 .permitAll()
                                 .anyRequest()
                                 .fullyAuthenticated()
@@ -59,7 +65,7 @@ public class SecurityConfig {
                 .exceptionHandling(ehConfig ->
                         ehConfig.authenticationEntryPoint(authenticationEntryPoint())
                                 .accessDeniedHandler(accessDeniedHandler()))
-                .addFilterBefore(new JwtFilter(jwtTokenUtil, userDetailsService()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtTokenUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -71,9 +77,10 @@ public class SecurityConfig {
             String errorPath = request.getRequestURI();
             String errorMessage = accessDeniedException.getMessage();
             int errorCode = 403;
+            response.setHeader("Content-Type", "application/json");
             response.setStatus(errorCode);
             ServletOutputStream outputStream = response.getOutputStream();
-            objectMapper.writeValue(outputStream, "access denied");
+            objectMapper.writeValue(outputStream, Map.of("error_message", "access denied"));
         };
     }
 
@@ -84,13 +91,14 @@ public class SecurityConfig {
             String errorPath = request.getRequestURI();
             String errorMessage = authException.getMessage();
             int errorCode = 401;
+            response.setHeader("Content-Type", "application/json");
             response.setStatus(errorCode);
             ServletOutputStream outputStream = response.getOutputStream();
-            objectMapper.writeValue(outputStream, "unauthorized");
+            objectMapper.writeValue(outputStream, Map.of("error_message", "unauthorized"));
         };
     }
 
-    @Bean
+    /*@Bean
     public UserDetailsService userDetailsService() {
         UserDetails admin = User.builder()
                 .username("admin")
@@ -108,12 +116,17 @@ public class SecurityConfig {
                 .roles("USER")
                 .build();
         return new InMemoryUserDetailsManager(admin, manager, user);
-    }
+    }*/
 
 
-    @Bean
+   /* @Bean
     public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance(); // never use this on production
+    }*/
+
+    @Bean
+    public PasswordEncoder bcryptPasswordEncoder() {
+        return new BCryptPasswordEncoder(); // never use this on production
     }
 
 
@@ -145,8 +158,8 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        authenticationProvider.setUserDetailsService(userDetailsService());
+        authenticationProvider.setPasswordEncoder(bcryptPasswordEncoder());
+        authenticationProvider.setUserDetailsService(userDetailsService);
         return authenticationProvider;
     }
 

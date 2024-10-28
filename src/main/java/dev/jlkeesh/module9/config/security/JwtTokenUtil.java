@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JwtTokenUtil {
@@ -19,12 +20,14 @@ public class JwtTokenUtil {
     );
 
     public String generateToken(String username) {
+        Map<String, Object> claims = Map.of("me", "you");
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setIssuer("https://online.pdp.uz")
                 .setExpiration(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
                 .signWith(signingKey, SignatureAlgorithm.HS256)
+                .addClaims(claims)
                 .compact();
     }
 
