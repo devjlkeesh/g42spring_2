@@ -1,0 +1,12 @@
+GET http://localhost:9090/employee
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYW5hZ2VyIiwiaWF0IjoxNzMwMTI2MzA5LCJpc3MiOiJodHRwczovL29ubGluZS5wZHAudXoiLCJleHAiOjE3MzAxMjY5MDl9.yY95U0UveNWVNFtOaR7mCBxEAjfwVDL-5e_xzGUADqk
+Accept: application/json
+
+###
+POST http://localhost:9090/api/auth/token
+Content-Type: application/json
+
+{
+  "username": "manager",
+  "password": "123"
+}
