@@ -1,5 +1,7 @@
 package dev.jlkeesh.module9.configuration.security;
 
+import dev.jlkeesh.module9.dto.auth.CustomUserDetails;
+import dev.jlkeesh.module9.dto.auth.UserSessionData;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -45,9 +47,15 @@ public class AuthJwtRequestFilter extends OncePerRequestFilter {
         }
 
         String username = jwtTokenUtil.getUsername(token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
+        var userSessionData = new UserSessionData(
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                userDetails.getAuthorities()
+        );
         UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                new UsernamePasswordAuthenticationToken(userSessionData, null, userDetails.getAuthorities());
         WebAuthenticationDetails webAuthenticationDetails = new WebAuthenticationDetailsSource().buildDetails(request);
         authentication.setDetails(webAuthenticationDetails);
         SecurityContextHolder.getContext().setAuthentication(authentication);

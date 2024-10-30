@@ -6,15 +6,10 @@ import dev.jlkeesh.module9.dto.auth.AuthUserCreateDto;
 import dev.jlkeesh.module9.dto.auth.GenerateTokenRequest;
 import dev.jlkeesh.module9.dto.auth.RefreshTokenRequest;
 import dev.jlkeesh.module9.dto.auth.TokenResponse;
+import dev.jlkeesh.module9.dto.auth.UserSessionData;
 import dev.jlkeesh.module9.service.AuthUserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,9 +47,9 @@ public class AuthUserController {
 
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.CREATED)
-    public BaseResponse<Object> getMe() {
-        UserDetails userDetails = authUserService.getMe();
-        return new BaseResponse<>(userDetails);
+    public BaseResponse<UserSessionData> getMe() {
+        var userSessionData = authUserService.getMe();
+        return new BaseResponse<>(userSessionData);
     }
 
 

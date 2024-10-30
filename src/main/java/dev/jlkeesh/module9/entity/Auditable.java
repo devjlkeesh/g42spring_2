@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @MappedSuperclass
-@Embeddable
 public class Auditable {
 
     @CurrentTimestamp(event = EventType.INSERT, source = SourceType.VM)

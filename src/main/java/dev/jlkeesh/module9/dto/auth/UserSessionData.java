@@ -1,12 +1,9 @@
 package dev.jlkeesh.module9.dto.auth;
 
-import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
 
-public record UserSessionData(
-        Long id,
-        String username,
-        String email,
-        List<String> author
-) {
+import java.util.Collection;
 
+public record UserSessionData(Long id, String username, String email,
+                              Collection<? extends GrantedAuthority> authorities) {
 }

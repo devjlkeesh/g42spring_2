@@ -4,6 +4,7 @@ import dev.jlkeesh.module9.dto.auth.AuthUserCreateDto;
 import dev.jlkeesh.module9.dto.auth.GenerateTokenRequest;
 import dev.jlkeesh.module9.dto.auth.RefreshTokenRequest;
 import dev.jlkeesh.module9.dto.auth.TokenResponse;
+import dev.jlkeesh.module9.dto.auth.UserSessionData;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AuthUserService {
@@ -14,5 +15,5 @@ public interface AuthUserService {
 
     TokenResponse refreshToken(RefreshTokenRequest dto);
 
-    UserDetails getMe();
+    UserSessionData getMe();
 }

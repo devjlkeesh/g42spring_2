@@ -6,6 +6,7 @@ import dev.jlkeesh.module9.dto.auth.AuthUserCreateDto;
 import dev.jlkeesh.module9.dto.auth.GenerateTokenRequest;
 import dev.jlkeesh.module9.dto.auth.RefreshTokenRequest;
 import dev.jlkeesh.module9.dto.auth.TokenResponse;
+import dev.jlkeesh.module9.dto.auth.UserSessionData;
 import dev.jlkeesh.module9.entity.AuthUser;
 import dev.jlkeesh.module9.enums.JwtTokenType;
 import dev.jlkeesh.module9.repository.AuthUserRepository;
@@ -14,7 +15,6 @@ import io.jsonwebtoken.Claims;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -78,8 +78,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     @Override
-    public UserDetails getMe() {
-        UserDetails userDetails = userSession.requireUserDetails();
-        return userDetails;
+    public UserSessionData getMe() {
+        return userSession.requireUserData();
     }
 }
