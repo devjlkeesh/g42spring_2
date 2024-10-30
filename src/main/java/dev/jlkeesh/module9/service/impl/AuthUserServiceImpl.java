@@ -3,12 +3,15 @@ package dev.jlkeesh.module9.service.impl;
 import dev.jlkeesh.module9.configuration.security.JwtTokenUtil;
 import dev.jlkeesh.module9.dto.auth.AuthUserCreateDto;
 import dev.jlkeesh.module9.dto.auth.GenerateTokenDto;
+import dev.jlkeesh.module9.dto.auth.RefreshTokenDto;
 import dev.jlkeesh.module9.dto.auth.TokenResponseDto;
 import dev.jlkeesh.module9.entity.AuthUser;
 import dev.jlkeesh.module9.enums.JwtTokenType;
 import dev.jlkeesh.module9.repository.AuthUserRepository;
 import dev.jlkeesh.module9.service.AuthUserService;
+import io.jsonwebtoken.Claims;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -52,5 +55,21 @@ public class AuthUserServiceImpl implements AuthUserService {
         authUser.setEmail(dto.email());
         authUserRepository.save(authUser);
         return authUser.getId();
+    }
+
+    @Override
+    public TokenResponseDto refreshToken(RefreshTokenDto dto) {
+        String refreshToken = dto.token();
+        if (!jwtTokenUtil.isValid(refreshToken)) {
+            throw new BadCredentialsException("refreshToken invalid");
+        }
+        Claims claims = jwtTokenUtil.getClaims(refreshToken);
+        if (claims.get("token") == null || !claims.get("token").equals("REFRESH")) {
+            throw new BadCredentialsException("refreshToken invalid");
+        }
+        var accessTokenClaims = Map.<String, Object>of("refreshToken", JwtTokenType.ACCESS);
+        String username = claims.get("sub", String.class);
+        String accessToken = jwtTokenUtil.generateAccessToken(username, accessTokenClaims);
+        return new TokenResponseDto(accessToken, refreshToken);
     }
 }

@@ -70,7 +70,7 @@ public class JwtTokenUtil {
         return claims.getSubject();
     }
 
-    private Claims getClaims(String token) {
+    public Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(signingKey)
                 .build()
