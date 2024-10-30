@@ -1,17 +1,18 @@
 package dev.jlkeesh.module9.service;
 
 import dev.jlkeesh.module9.dto.auth.AuthUserCreateDto;
-import dev.jlkeesh.module9.dto.auth.GenerateTokenDto;
-import dev.jlkeesh.module9.dto.auth.RefreshTokenDto;
-import dev.jlkeesh.module9.dto.auth.TokenResponseDto;
-import dev.jlkeesh.module9.enums.JwtTokenType;
-import jakarta.validation.Valid;
+import dev.jlkeesh.module9.dto.auth.GenerateTokenRequest;
+import dev.jlkeesh.module9.dto.auth.RefreshTokenRequest;
+import dev.jlkeesh.module9.dto.auth.TokenResponse;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AuthUserService {
 
-    TokenResponseDto generateAccessToken(GenerateTokenDto dto);
+    TokenResponse generateAccessToken(GenerateTokenRequest dto);
 
     Long createUser( AuthUserCreateDto dto);
 
-    TokenResponseDto refreshToken( RefreshTokenDto dto);
+    TokenResponse refreshToken(RefreshTokenRequest dto);
+
+    UserDetails getMe();
 }

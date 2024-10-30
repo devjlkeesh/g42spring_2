@@ -1,10 +1,11 @@
 package dev.jlkeesh.module9.service.impl;
 
 import dev.jlkeesh.module9.configuration.security.JwtTokenUtil;
+import dev.jlkeesh.module9.configuration.security.UserSession;
 import dev.jlkeesh.module9.dto.auth.AuthUserCreateDto;
-import dev.jlkeesh.module9.dto.auth.GenerateTokenDto;
-import dev.jlkeesh.module9.dto.auth.RefreshTokenDto;
-import dev.jlkeesh.module9.dto.auth.TokenResponseDto;
+import dev.jlkeesh.module9.dto.auth.GenerateTokenRequest;
+import dev.jlkeesh.module9.dto.auth.RefreshTokenRequest;
+import dev.jlkeesh.module9.dto.auth.TokenResponse;
 import dev.jlkeesh.module9.entity.AuthUser;
 import dev.jlkeesh.module9.enums.JwtTokenType;
 import dev.jlkeesh.module9.repository.AuthUserRepository;
@@ -13,6 +14,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,16 +27,18 @@ public class AuthUserServiceImpl implements AuthUserService {
     private final JwtTokenUtil jwtTokenUtil;
     private final PasswordEncoder bcryptPasswordEncoder;
     private final AuthUserRepository authUserRepository;
+    private final UserSession userSession;
 
-    public AuthUserServiceImpl(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, PasswordEncoder bcryptPasswordEncoder, AuthUserRepository authUserRepository) {
+    public AuthUserServiceImpl(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, PasswordEncoder bcryptPasswordEncoder, AuthUserRepository authUserRepository, UserSession userSession) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.bcryptPasswordEncoder = bcryptPasswordEncoder;
         this.authUserRepository = authUserRepository;
+        this.userSession = userSession;
     }
 
     @Override
-    public TokenResponseDto generateAccessToken(GenerateTokenDto dto) {
+    public TokenResponse generateAccessToken(GenerateTokenRequest dto) {
         String username = dto.username();
         String password = dto.password();
         UsernamePasswordAuthenticationToken authentication =
@@ -44,7 +48,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         var refreshTokenClaims = Map.<String, Object>of("token", JwtTokenType.REFRESH);
         String accessToken = jwtTokenUtil.generateAccessToken(username, accessTokenClaims);
         String refreshToken = jwtTokenUtil.generateRefreshToken(username, refreshTokenClaims);
-        return new TokenResponseDto(accessToken, refreshToken);
+        return new TokenResponse(accessToken, refreshToken);
     }
 
     @Override
@@ -58,7 +62,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     @Override
-    public TokenResponseDto refreshToken(RefreshTokenDto dto) {
+    public TokenResponse refreshToken(RefreshTokenRequest dto) {
         String refreshToken = dto.token();
         if (!jwtTokenUtil.isValid(refreshToken)) {
             throw new BadCredentialsException("refreshToken invalid");
@@ -70,6 +74,12 @@ public class AuthUserServiceImpl implements AuthUserService {
         var accessTokenClaims = Map.<String, Object>of("refreshToken", JwtTokenType.ACCESS);
         String username = claims.get("sub", String.class);
         String accessToken = jwtTokenUtil.generateAccessToken(username, accessTokenClaims);
-        return new TokenResponseDto(accessToken, refreshToken);
+        return new TokenResponse(accessToken, refreshToken);
+    }
+
+    @Override
+    public UserDetails getMe() {
+        UserDetails userDetails = userSession.requireUserDetails();
+        return userDetails;
     }
 }
