@@ -1,7 +1,7 @@
 package dev.jlkeesh.module9.controller;
 
 import dev.jlkeesh.module9.entity.AuthRole;
-import dev.jlkeesh.module9.entity.AuthRoleCreateDto;
+import dev.jlkeesh.module9.dto.auth.AuthRoleCreateDto;
 import dev.jlkeesh.module9.repository.AuthRoleRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/auth/role")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('admin')")
 @RequiredArgsConstructor
 public class AuthRoleController {
 

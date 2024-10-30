@@ -1,4 +1,4 @@
-package dev.jlkeesh.module9.config.security;
+package dev.jlkeesh.module9.dto.auth;
 
 import dev.jlkeesh.module9.entity.AuthPermission;
 import dev.jlkeesh.module9.entity.AuthRole;

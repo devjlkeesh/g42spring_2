@@ -1,5 +1,6 @@
-package dev.jlkeesh.module9.entity;
+package dev.jlkeesh.module9.dto.auth;
 
+import dev.jlkeesh.module9.entity.AuthRole;
 import jakarta.validation.constraints.NotBlank;
 
 import java.io.Serializable;

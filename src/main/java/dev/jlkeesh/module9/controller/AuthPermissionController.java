@@ -1,7 +1,7 @@
 package dev.jlkeesh.module9.controller;
 
 import dev.jlkeesh.module9.entity.AuthPermission;
-import dev.jlkeesh.module9.entity.AuthPermissionCreateDto;
+import dev.jlkeesh.module9.dto.auth.AuthPermissionCreateDto;
 import dev.jlkeesh.module9.repository.AuthPermissionRepository;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;

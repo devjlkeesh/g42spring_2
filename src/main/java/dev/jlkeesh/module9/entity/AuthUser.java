@@ -2,6 +2,7 @@ package dev.jlkeesh.module9.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,7 +42,7 @@ public class AuthUser extends Auditable {
 
     private String otp;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "auth_user_roles",
             joinColumns = @JoinColumn(name = "auth_user_id", referencedColumnName = "id"),

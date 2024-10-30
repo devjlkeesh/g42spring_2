@@ -1,5 +1,6 @@
-package dev.jlkeesh.module9.config.security;
+package dev.jlkeesh.module9.service.impl;
 
+import dev.jlkeesh.module9.dto.auth.CustomUserDetails;
 import dev.jlkeesh.module9.entity.AuthUser;
 import dev.jlkeesh.module9.repository.AuthUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
+
     private final AuthUserRepository authUserRepository;
 
     @Override

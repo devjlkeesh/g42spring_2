@@ -1,4 +1,4 @@
-package dev.jlkeesh.module9.dto;
+package dev.jlkeesh.module9.dto.auth;
 
 import dev.jlkeesh.module9.entity.AuthUser;
 

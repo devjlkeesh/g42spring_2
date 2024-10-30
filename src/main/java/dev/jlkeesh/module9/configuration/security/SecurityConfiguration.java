@@ -1,8 +1,7 @@
-package dev.jlkeesh.module9.config.security;
+package dev.jlkeesh.module9.configuration.security;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletOutputStream;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,21 +16,19 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
-import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class SecurityConfig {
+@RequiredArgsConstructor
+public class SecurityConfiguration {
 
 
     public static final String[] WHITE_LIST = {
@@ -40,16 +37,10 @@ public class SecurityConfig {
             "/swagger-resources/**",
             "/v3/api-docs/**",
     };
-    private final ObjectMapper objectMapper;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserDetailsService userDetailsService;
-
-    public SecurityConfig(ObjectMapper objectMapper,
-                          JwtTokenUtil jwtTokenUtil, UserDetailsService userDetailsService) {
-        this.objectMapper = objectMapper;
-        this.jwtTokenUtil = jwtTokenUtil;
-        this.userDetailsService = userDetailsService;
-    }
+    private final AccessDeniedHandler accessDeniedHandler;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -63,70 +54,15 @@ public class SecurityConfig {
                 )
                 .sessionManagement(sessionConf -> sessionConf.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ehConfig ->
-                        ehConfig.authenticationEntryPoint(authenticationEntryPoint())
-                                .accessDeniedHandler(accessDeniedHandler()))
-                .addFilterBefore(new JwtFilter(jwtTokenUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
+                        ehConfig.authenticationEntryPoint(authenticationEntryPoint)
+                                .accessDeniedHandler(accessDeniedHandler))
+                .addFilterBefore(new AuthJwtRequestFilter(jwtTokenUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .build();
-    }
-
-
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, accessDeniedException) -> {
-            accessDeniedException.printStackTrace();
-            String errorPath = request.getRequestURI();
-            String errorMessage = accessDeniedException.getMessage();
-            int errorCode = 403;
-            response.setHeader("Content-Type", "application/json");
-            response.setStatus(errorCode);
-            ServletOutputStream outputStream = response.getOutputStream();
-            objectMapper.writeValue(outputStream, Map.of("error_message", "access denied"));
-        };
     }
 
     @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint() {
-        return (request, response, authException) -> {
-            authException.printStackTrace();
-            String errorPath = request.getRequestURI();
-            String errorMessage = authException.getMessage();
-            int errorCode = 401;
-            response.setHeader("Content-Type", "application/json");
-            response.setStatus(errorCode);
-            ServletOutputStream outputStream = response.getOutputStream();
-            objectMapper.writeValue(outputStream, Map.of("error_message", "unauthorized"));
-        };
-    }
-
-    /*@Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password("123")
-                .roles("ADMIN", "MANAGER")
-                .build();
-        UserDetails manager = User.builder()
-                .username("manager")
-                .password("123")
-                .roles("MANAGER")
-                .build();
-        UserDetails user = User.builder()
-                .username("user")
-                .password("123")
-                .roles("USER")
-                .build();
-        return new InMemoryUserDetailsManager(admin, manager, user);
-    }*/
-
-
-   /* @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance(); // never use this on production
-    }*/
-
-    @Bean
-    public PasswordEncoder bcryptPasswordEncoder() {
-        return new BCryptPasswordEncoder(); // never use this on production
+        return new BCryptPasswordEncoder();
     }
 
 
@@ -138,19 +74,13 @@ public class SecurityConfig {
                 "http://localhost:9090",
                 "http://localhost:9095"
         ));
-        configuration.setAllowedHeaders(List.of("*"
-                /*"Accept",
-                "Content-Type",
-                "Authorization"*/
-        ));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedMethods(List.of(
                 "GET", "POST", "DELETE", "PUT"
         ));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-        /*source.registerCorsConfiguration("/api/v2/**", configuration2);
-        source.registerCorsConfiguration("/api/v3/**", configuration3);*/
         return source;
     }
 
@@ -158,7 +88,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setPasswordEncoder(bcryptPasswordEncoder());
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
         authenticationProvider.setUserDetailsService(userDetailsService);
         return authenticationProvider;
     }

@@ -1,4 +1,4 @@
-package dev.jlkeesh.module9.config.security;
+package dev.jlkeesh.module9.configuration.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,12 +14,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-public class JwtFilter extends OncePerRequestFilter {
+public class AuthJwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final UserDetailsService userDetailsService;
 
-    public JwtFilter(JwtTokenUtil jwtTokenUtil, UserDetailsService userDetailsService) {
+    public AuthJwtRequestFilter(JwtTokenUtil jwtTokenUtil, UserDetailsService userDetailsService) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.userDetailsService = userDetailsService;
     }
