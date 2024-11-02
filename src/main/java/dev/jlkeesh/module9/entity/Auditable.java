@@ -21,11 +21,13 @@ public class Auditable {
 
     @CreatedBy
     private Long createdBy;
+    // createdUserDetails,username , email, authorities
 
     @CurrentTimestamp(event = EventType.UPDATE, source = SourceType.VM)
     private LocalDateTime updatedAt;
 
     @LastModifiedBy
     private Long updatedBy;
+    // createdUserDetails,username , email, authorities
 
 }

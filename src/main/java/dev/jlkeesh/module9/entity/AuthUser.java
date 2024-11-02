@@ -1,5 +1,6 @@
 package dev.jlkeesh.module9.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,6 +25,11 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "auth_users")
+@Schema(
+        implementation = AuthUser.class,
+        name = "AuthUser",
+        description = "this is auth_user entity which is hibernate object"
+)
 public class AuthUser extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
