@@ -4,7 +4,9 @@ import dev.jlkeesh.module9.criteria.AuthRoleCriteria;
 import dev.jlkeesh.module9.dto.ErrorData;
 import dev.jlkeesh.module9.dto.PageDto;
 import dev.jlkeesh.module9.dto.auth.AuthRoleCreateDto;
+import dev.jlkeesh.module9.dto.auth.AuthRoleDto;
 import dev.jlkeesh.module9.entity.AuthRole;
+import dev.jlkeesh.module9.mapper.AuthRoleMapper;
 import dev.jlkeesh.module9.repository.AuthRoleRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,11 +27,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth/role")
 @PreAuthorize("hasRole('admin')")
-@RequiredArgsConstructor
 @Tag(name = "Auth Role Controller", description = "this group is responsible ....")
 public class AuthRoleController {
 
     private final AuthRoleRepository authRoleRepository;
+    private final AuthRoleMapper authRoleMapper;
+
+    public AuthRoleController(AuthRoleRepository authRoleRepository, AuthRoleMapper authRoleMapper) {
+        this.authRoleRepository = authRoleRepository;
+        this.authRoleMapper = authRoleMapper;
+    }
 
 
     @Deprecated
@@ -39,9 +45,7 @@ public class AuthRoleController {
             "application/xml"
     })
     public Integer create(@Valid @RequestBody AuthRoleCreateDto dto) {
-        AuthRole authRole = new AuthRole();
-        authRole.setName(dto.name());
-        authRole.setDescription(dto.description());
+        AuthRole authRole = authRoleMapper.fromCreateDto(dto);
         authRoleRepository.save(authRole);
         return authRole.getId();
     }
@@ -56,13 +60,14 @@ public class AuthRoleController {
             }
     )
     @GetMapping
-    public PageDto<AuthRole> findAll(AuthRoleCriteria criteria) {
+    public PageDto<AuthRoleDto> findAll(AuthRoleCriteria criteria) {
         Pageable pageable = PageRequest.of(
                 criteria.getPage(),
                 criteria.getSize(),
                 criteria.getSort()
         );
-        Page<AuthRole> page = authRoleRepository.findAll(pageable);
+        Page<AuthRoleDto> page = authRoleRepository.findAll(pageable)
+                .map(authRoleMapper::toDto);
         return new PageDto<>(page);
     }
 

@@ -8,6 +8,6 @@ import java.io.Serializable;
 /**
  * DTO for {@link AuthRole}
  */
-public record AuthRoleCreateDto(@NotBlank(message = "name can not be blank") String name,
+public record AuthRoleCreateDto(@NotBlank(message = "name can not be blank") String authRoleName,
                                 @NotBlank(message = "description can not be blank") String description) implements Serializable {
 }
