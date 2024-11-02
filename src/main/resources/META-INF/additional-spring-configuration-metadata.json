@@ -1,0 +1,28 @@
+{
+  "groups": [
+
+  ],
+  "properties": [
+    {
+      "name": "jwt.key-secret",
+      "type": "java.lang.String",
+      "description": "the the secret key for jwt."
+    },
+    {
+      "name": "jwt.secret-key",
+      "type": "java.lang.String",
+      "description": "the secret key for jwt.",
+      "deprecation": {
+        "level": "warning",
+        "reason": "reason for.",
+        "replacement": "jwt.key-secret"
+      }
+    },
+    {
+      "name": "test.fun-type",
+      "type": "dev.jlkeesh.module9.properties.FunType",
+      "description": "the the secret key for jwt.",
+      "defaultValue": "XYZ"
+    }
+  ]
+}

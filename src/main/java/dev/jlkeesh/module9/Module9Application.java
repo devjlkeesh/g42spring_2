@@ -1,6 +1,7 @@
 package dev.jlkeesh.module9;
 
 import dev.jlkeesh.module9.configuration.security.UserSession;
+import dev.jlkeesh.module9.properties.JwtProperties;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
@@ -8,6 +9,9 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -18,23 +22,11 @@ import java.util.Optional;
 
 @SpringBootApplication
 @EnableJpaAuditing
-/*@OpenAPIDefinition(
-        info = @Info(
-                title = "This project is for learning only",
-                description = "This project is for learning only(description)",
-                version = "0.0.12",
-                contact = @Contact(
-                        name = "G42",
-                        url = "https://g42.io",
-                        email = "g42@gmail.com"
-                )
-        )
-)
-@SecurityScheme(
-        name = "Bearer Authentication",
-        type = SecuritySchemeType.HTTP,
-        bearerFormat = "JWT",
-        scheme = "bearer"
+@ConfigurationPropertiesScan
+/*@EnableConfigurationProperties(
+        value = {
+                JwtProperties.class
+        }
 )*/
 public class Module9Application {
 

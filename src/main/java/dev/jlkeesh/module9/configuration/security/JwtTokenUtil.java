@@ -1,5 +1,6 @@
 package dev.jlkeesh.module9.configuration.security;
 
+import dev.jlkeesh.module9.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -18,37 +19,31 @@ import java.util.Map;
 public class JwtTokenUtil {
 
     private final Key signingKey;
-    private final long accessTokenValidityInSeconds;
-    private final long refreshTokenValidityInSeconds;
-    private final String issuer;
+    private final JwtProperties jwtProperties;
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
 
-    public JwtTokenUtil(@Value("${jwt.secret.key}") String secretKey,
-                        @Value("${jwt.access-token.ttl}") long accessTokenValidityInSeconds,
-                        @Value("${jwt.refresh-token.ttl}") long refreshTokenValidityInSeconds,
-                        @Value("${jwt.issuer}") String issuer) {
-        this.accessTokenValidityInSeconds = accessTokenValidityInSeconds;
-        this.signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
-        this.refreshTokenValidityInSeconds = refreshTokenValidityInSeconds;
-        this.issuer = issuer;
+    public JwtTokenUtil(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+        this.signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecretKey()));
     }
 
     public String generateAccessToken(String username, Map<String, Object> claims) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setIssuer(issuer)
-                .setExpiration(new Date(System.currentTimeMillis() + accessTokenValidityInSeconds * 1000))
+                .setIssuer(jwtProperties.getIssuer())
+                .setExpiration(jwtProperties.getAccessTokenTtl())
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .addClaims(claims)
                 .compact();
     }
+
     public String generateRefreshToken(String username, Map<String, Object> claims) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setIssuer(issuer)
-                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidityInSeconds * 1000))
+                .setIssuer(jwtProperties.getIssuer())
+                .setExpiration(jwtProperties.getRefreshTokenTtl())
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .addClaims(claims)
                 .compact();
