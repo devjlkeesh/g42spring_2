@@ -1,3 +1,7 @@
+logging:
+  level:
+    dev.jlkeesh: trace
+    root: info
 spring:
   mail:
     host: sandbox.smtp.mailtrap.io
