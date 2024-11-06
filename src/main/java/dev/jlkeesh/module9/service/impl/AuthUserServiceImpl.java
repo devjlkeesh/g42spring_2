@@ -11,7 +11,9 @@ import dev.jlkeesh.module9.entity.AuthUser;
 import dev.jlkeesh.module9.enums.JwtTokenType;
 import dev.jlkeesh.module9.repository.AuthUserRepository;
 import dev.jlkeesh.module9.service.AuthUserService;
+import dev.jlkeesh.module9.service.MailService;
 import io.jsonwebtoken.Claims;
+import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class AuthUserServiceImpl implements AuthUserService {
@@ -28,13 +31,15 @@ public class AuthUserServiceImpl implements AuthUserService {
     private final PasswordEncoder bcryptPasswordEncoder;
     private final AuthUserRepository authUserRepository;
     private final UserSession userSession;
+    private final MailService mailService;
 
-    public AuthUserServiceImpl(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, PasswordEncoder bcryptPasswordEncoder, AuthUserRepository authUserRepository, UserSession userSession) {
+    public AuthUserServiceImpl(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, PasswordEncoder bcryptPasswordEncoder, AuthUserRepository authUserRepository, UserSession userSession, MailService mailService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.bcryptPasswordEncoder = bcryptPasswordEncoder;
         this.authUserRepository = authUserRepository;
         this.userSession = userSession;
+        this.mailService = mailService;
     }
 
     @Override
@@ -52,12 +57,15 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     @Override
+    @Transactional
     public Long createUser(AuthUserCreateDto dto) {
         AuthUser authUser = new AuthUser();
         authUser.setUsername(dto.username());
         authUser.setPassword(bcryptPasswordEncoder.encode(dto.password()));
         authUser.setEmail(dto.email());
         authUserRepository.save(authUser);
+        String otp = "" + ThreadLocalRandom.current().nextInt(10_000_000, 100_000_000);
+        mailService.sendOtp(authUser.getEmail(), otp);
         return authUser.getId();
     }
 

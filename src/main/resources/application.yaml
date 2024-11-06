@@ -1,0 +1,45 @@
+spring:
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: 5f07f55e097d61
+    password: c5367295e9be96
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  freemarker:
+    template-loader-path: classpath:/templates/
+white.list:
+  matchers:
+    - method: GET
+      patterns:
+        - /swagger-ui.html
+        - /swagger-ui/**
+        - /swagger-resources/**
+        - /v3/api-docs/**
+        - /swagger-resources/**
+    - method: POST
+      patterns:
+        - /auth/**
+
+test:
+  value: default profile ${random.uuid}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+test:
+  value: prod profile
+
+---
+spring:
+  config:
+    activate:
+      on-profile: qa
+test:
+  value: qa profile ${random.uuid}

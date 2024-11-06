@@ -1,10 +1,10 @@
 package dev.jlkeesh.module9.configuration.security;
 
 
+import dev.jlkeesh.module9.properties.WhiteListProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -19,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,25 +33,19 @@ import java.util.List;
 public class SecurityConfiguration {
 
 
-    public static final String[] WHITE_LIST = {
-            "/auth/**",
-            "/swagger-ui.html",
-            "/swagger-ui/**",
-            "/swagger-resources/**",
-            "/v3/api-docs/**",
-    };
     private final JwtTokenUtil jwtTokenUtil;
     private final UserDetailsService userDetailsService;
     private final AccessDeniedHandler accessDeniedHandler;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, WhiteListProperties whiteListProperties) throws Exception {
+        RequestMatcher[] requestMatchers = whiteListProperties.getRequestMatchers();
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(httpReqConf ->
                         httpReqConf
-                                .requestMatchers(WHITE_LIST)
+                                .requestMatchers(requestMatchers)
                                 .permitAll()
                                 .anyRequest()
                                 .fullyAuthenticated()
