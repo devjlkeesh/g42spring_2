@@ -1,5 +1,6 @@
 logging:
   level:
+    org.zalando.logbook: trace
     dev.jlkeesh: trace
     root: info
 spring:
