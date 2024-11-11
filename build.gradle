@@ -31,6 +31,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.zalando/logbook-spring-boot-starter
     implementation 'org.zalando:logbook-spring-boot-starter:3.10.0'
+    annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen:6.6.2.Final'
+
 
     implementation 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
